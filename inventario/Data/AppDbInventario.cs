@@ -15,5 +15,5 @@ public class AppDbInventario : DbContext
     public DbSet<Persona> Personas { get; set; }
     public DbSet<Rol> Roles { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
-    public DbSet<Proceso>Procesos { get; set; }
+    public DbSet<Proceso> Procesos { get; set; }
 }
