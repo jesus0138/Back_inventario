@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using inventario.Data;
+using Scalar.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -8,13 +10,15 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbInventario>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")).UseLazyLoadingProxies()
 );
+builder.Services.AddControllers();
 
 var app = builder.Build();
-
+app.MapControllers();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
