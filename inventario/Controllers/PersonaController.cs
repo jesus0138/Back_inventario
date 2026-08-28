@@ -1,5 +1,4 @@
 ﻿using inventario.Models;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using inventario.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -51,20 +50,20 @@ public class PersonaController: ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> PutPersona(int id, Persona persona)
     {
-        var PersonaExistente = await _context.Personas.FindAsync(id);
-        if (PersonaExistente==null)
+        var personaExistente = await _context.Personas.FindAsync(id);
+        if (personaExistente==null)
         {
             return NotFound();
         }
 
        
         
-        PersonaExistente.Nombre = persona.Nombre;
-        PersonaExistente.Identidad=persona.Identidad;
-        PersonaExistente.Telefono=persona.Telefono;
-        PersonaExistente.Cargo = persona.Cargo;
-        PersonaExistente.CuadrillaId=persona.CuadrillaId;
+        personaExistente.Nombre = persona.Nombre;
+        personaExistente.Identidad=persona.Identidad;
+        personaExistente.Telefono=persona.Telefono;
+        personaExistente.Cargo = persona.Cargo;
+        personaExistente.CuadrillaId=persona.CuadrillaId;
         await _context.SaveChangesAsync();
-        return Ok(PersonaExistente);
+        return Ok(personaExistente);
     }
 }
