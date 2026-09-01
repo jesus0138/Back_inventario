@@ -28,7 +28,15 @@ public class AuthController:ControllerBase
             return BadRequest("Usuario no encontrado o Contreseña incorrecta");
         }
         bool existe=BCrypt.Net.BCrypt.Verify(loginDto.Password,usuario.Password);
+        if (existe == true)
+        {
+            return Ok(new{nombreUsuario = usuario.NombreUsuario });
+        }
+        else
+        {
+            return BadRequest("Acceso denegado, Contraseña o usuario incorrecto");
+        }
 
-        return Ok();
+      
     }
 }
