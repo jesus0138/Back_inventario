@@ -42,4 +42,17 @@ public class UsuarioController:ControllerBase
         
     }
     //necesito terminar de hacer el metodo delete y put
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteUsuario(int id)
+    {
+        var usuario = await _context.Usuarios.FindAsync(id);
+        if (usuario==null)
+        {
+            return NotFound();
+        }
+        _context.Usuarios.Remove(usuario);
+        await _context.SaveChangesAsync();
+        
+        return Ok(usuario);
+    }
 }

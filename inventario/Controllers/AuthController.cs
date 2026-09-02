@@ -34,7 +34,7 @@ public class AuthController:ControllerBase
         }
         else
         {
-            return BadRequest("Acceso denegado, Contraseña o usuario incorrecto");
+            return BadRequest("Contraseña o usuario incorrecto");
         }
 
       
