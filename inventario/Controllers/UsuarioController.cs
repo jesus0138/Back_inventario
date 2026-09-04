@@ -42,4 +42,35 @@ public class UsuarioController:ControllerBase
         
     }
     //necesito terminar de hacer el metodo delete y put
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteUsuario(int id)
+    {
+        var usuario = await _context.Usuarios.FindAsync(id);
+        if (usuario==null)
+        {
+            return NotFound();
+        }
+        _context.Usuarios.Remove(usuario);
+        await _context.SaveChangesAsync();
+        
+        return Ok(usuario);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutUsuario(int id, Usuario usuario)
+    {
+        var existente = await _context.Usuarios.FindAsync(id);
+        if (existente==null)
+        {
+            return NotFound(id);
+        }
+
+        existente.NombreUsuario = usuario.NombreUsuario;
+        existente.Password = BCrypt.Net.BCrypt.HashPassword(usuario.Password);
+        existente.RolId = usuario.RolId; 
+        existente.ProcesoId = usuario.ProcesoId;
+
+        await _context.SaveChangesAsync();
+        return Ok();
+    }
 }
