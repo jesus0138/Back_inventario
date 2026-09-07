@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using inventario.Data;
 using BCrypt.Net;
 using Microsoft.AspNetCore.Mvc;
+using inventario.Dtos;
 
 
 namespace inventario.Controllers;
@@ -27,15 +28,21 @@ public class UsuarioController:ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostUsuario(Usuario usuario)
+    public async Task<IActionResult> PostUsuario(UsuarioCreateDto dto)
     {
         bool existe=await _context.Usuarios
-            .AnyAsync(n=>n.NombreUsuario==usuario.NombreUsuario);
+            .AnyAsync(n=>n.NombreUsuario==dto.NombreUsuario);
         if (existe==true)
         {
             return BadRequest("El nombre de usuario ya existe");
         }
-        usuario.Password = BCrypt.Net.BCrypt.HashPassword(usuario.Password);
+        var usuario = new Usuario
+        {
+            NombreUsuario = dto.NombreUsuario,
+            Password = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+            RolId = dto.RolId,
+            ProcesoId = dto.ProcesoId
+        };
         _context.Usuarios.Add(usuario);
         await _context.SaveChangesAsync();
         return Ok();

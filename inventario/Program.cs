@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using inventario.Data;
+using inventario.Services;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +12,7 @@ builder.Services.AddDbContext<AppDbInventario>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")).UseLazyLoadingProxies()
 );
 builder.Services.AddControllers();
-
+builder.Services.AddScoped<ITokenService,TokenService>();
 var app = builder.Build();
 app.MapControllers();
 // Configure the HTTP request pipeline.
