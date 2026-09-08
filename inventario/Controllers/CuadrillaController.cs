@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using inventario.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
+using inventario.Dtos;
 
 namespace inventario.Controllers;
 [ApiController]
@@ -24,8 +25,7 @@ public class CuadrillaController:ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostCuadrilla(Cuadrilla cuadrilla)
-    {
+    public async Task<IActionResult> PostCuadrilla(CuadrillasCreateDto  cuadrilla){
         bool existe=await _context.Cuadrillas
             .AnyAsync(e=>e.Numero==cuadrilla.Numero);
         if (existe==true)
@@ -33,9 +33,16 @@ public class CuadrillaController:ControllerBase
             return BadRequest("Cuadrilla existente");
         }
 
-        _context.Cuadrillas.Add(cuadrilla);
+        var cuadrillas = new Cuadrilla
+        {
+            Numero = cuadrilla.Numero,
+            Sector = cuadrilla.Sector,
+            ProcesoId = cuadrilla.ProcesoId
+
+        };
+        _context.Cuadrillas.Add(cuadrillas);
         await _context.SaveChangesAsync();
-        return Ok(cuadrilla);
+        return Ok(cuadrillas);
     }
 
         [HttpDelete("{id}")]
