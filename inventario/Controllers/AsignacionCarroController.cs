@@ -5,7 +5,8 @@ using BCrypt.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.OpenApi;
-
+using inventario.Dtos;
+using Microsoft.VisualBasic;
 
 namespace inventario.Controllers;
 
@@ -28,18 +29,29 @@ public class AsignacionCarroController:ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostAsignacionCarro(AsignacionCarro asignacionCarro)
+    public async Task<IActionResult> PostAsignacionCarro(AsignacionCarroCreateDto dto)
     {
         bool existe = await _context.AsignacionCarros
-            .AnyAsync(a => a.CarroId == asignacionCarro.CarroId && a.FechaDevolucion == null);
+            .AnyAsync(a => a.CarroId == dto.CarroId && a.FechaDevolucion == null);
         if (existe==true)
         {
             return BadRequest("asignacion existente");
         }
 
-        _context.AsignacionCarros.Add(asignacionCarro);
+        var asignacion = new AsignacionCarro
+        {
+            PersonaId = dto.PersonaId,
+            CarroId = dto.CarroId,
+            AsignadoPorUsuarioId = dto.AsignadoPorUsuarioId,
+            FechaAsignacion =DateTime.UtcNow
+
+
+        };
+        
+
+        _context.AsignacionCarros.Add(asignacion);
         await _context.SaveChangesAsync();
-        return Ok(asignacionCarro);
+        return Ok(asignacion);
     }
 
     [HttpDelete("{id}")]
@@ -57,7 +69,7 @@ public class AsignacionCarroController:ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutAsignacionCarro(int id, AsignacionCarro asignacionCarro)
+    public async Task<IActionResult> PutAsignacionCarro(int id, AsignacionCarroCreateDto dto)
     {
         var existente = await _context.AsignacionCarros.FindAsync(id);
         if (existente==null)
@@ -65,12 +77,24 @@ public class AsignacionCarroController:ControllerBase
             return NotFound();
         }
 
-        existente.PersonaId = asignacionCarro.PersonaId;
-        existente.AsignadoPorUsuarioId = asignacionCarro.AsignadoPorUsuarioId;
-        existente.CarroId = asignacionCarro.CarroId;
-        existente.FechaAsignacion = asignacionCarro.FechaAsignacion;
-        existente.FechaDevolucion = asignacionCarro.FechaDevolucion;
+        existente.PersonaId = dto.PersonaId;
+        existente.AsignadoPorUsuarioId = dto.AsignadoPorUsuarioId;
+        existente.CarroId = dto.CarroId;
         await _context.SaveChangesAsync();
         return Ok();
+    }
+
+    [HttpPatch("{id}/devolver")]
+    public async Task<IActionResult> PatchAsignacionCarro(int id)
+    {
+        var existente = await _context.AsignacionCarros.FindAsync(id);
+        if (existente==null)
+        {
+            return NotFound();
+        }
+        existente.FechaDevolucion= DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+        return Ok();
+        
     }
 }

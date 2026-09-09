@@ -4,18 +4,20 @@ using inventario.Data;
 using BCrypt.Net;
 using inventario.Dtos;
 using Microsoft.AspNetCore.Mvc;
-
+using inventario.Services;
 
 namespace inventario.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController:ControllerBase
 {
     private readonly AppDbInventario _context;
-    
-    public AuthController(AppDbInventario context)
+    private readonly ITokenService _tokenService;
+    public AuthController(AppDbInventario context, ITokenService tokenService)
     {
         _context = context; 
+        _tokenService = tokenService;
     }
 
     [HttpPost]
@@ -30,7 +32,8 @@ public class AuthController:ControllerBase
         bool existe=BCrypt.Net.BCrypt.Verify(loginDto.Password,usuario.Password);
         if (existe == true)
         {
-            return Ok(new{nombreUsuario = usuario.NombreUsuario });
+            var token = _tokenService.GenerarToken(usuario);
+            return Ok(new { nombreUsuario = usuario.NombreUsuario, token = token });
         }
         else
         {

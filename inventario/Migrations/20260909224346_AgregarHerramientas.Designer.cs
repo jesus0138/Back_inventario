@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using inventario.Data;
@@ -11,9 +12,11 @@ using inventario.Data;
 namespace inventario.Migrations
 {
     [DbContext(typeof(AppDbInventario))]
-    partial class AppDbInventarioModelSnapshot : ModelSnapshot
+    [Migration("20260909224346_AgregarHerramientas")]
+    partial class AgregarHerramientas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -337,19 +340,19 @@ namespace inventario.Migrations
                     b.HasOne("inventario.Models.Usuario", "AsignadoPorUsuario")
                         .WithMany()
                         .HasForeignKey("AsignadoPorUsuarioId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("inventario.Models.Carro", "Carro")
                         .WithMany()
                         .HasForeignKey("CarroId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("inventario.Models.Persona", "Persona")
                         .WithMany()
                         .HasForeignKey("PersonaId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AsignadoPorUsuario");
@@ -364,19 +367,19 @@ namespace inventario.Migrations
                     b.HasOne("inventario.Models.Cuadrilla", "Cuadrilla")
                         .WithMany()
                         .HasForeignKey("CuadrillaId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("inventario.Models.Herramienta", "Herramienta")
                         .WithMany()
                         .HasForeignKey("HerramientaId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("inventario.Models.Persona", "Persona")
                         .WithMany()
                         .HasForeignKey("PersonaId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Cuadrilla");
