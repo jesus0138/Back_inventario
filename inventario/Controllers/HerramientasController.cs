@@ -30,7 +30,7 @@ public class HerramientasController:ControllerBase
     [HttpPost]
     public async Task<IActionResult> PostHerramientas(Herramienta herramienta)
     {
-        bool existe = await _context.AsignacionCarros
+        bool existe = await _context.Herramientas
             .AnyAsync(a => a.Id == herramienta.Id);
         if (existe==true)
         {
@@ -40,8 +40,42 @@ public class HerramientasController:ControllerBase
         await _context.SaveChangesAsync();
         return Ok(herramienta);
     }
-    
-    
-    
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteHerramientas(int id)
+    {
+        var herramienta = await _context.Herramientas.FindAsync(id);
+        if (herramienta==null)
+        {
+            return NotFound();
+        }
+
+        _context.Herramientas.Remove(herramienta);
+        await _context.SaveChangesAsync();
+        return Ok(herramienta);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutHerramientas(int id, Herramienta herramienta)
+    {
+        var existente = await _context.Herramientas.FindAsync(id);
+        if (existente==null)
+        {
+            return NotFound();
+        }
+        existente.Color=herramienta.Color;
+        existente.FechaAdquisicion = herramienta.FechaAdquisicion;
+        existente.Marca = herramienta.Marca;
+        existente.Modelo=herramienta.Modelo;
+        existente.Nombre = herramienta.Nombre;
+        existente.Stock=herramienta.Stock;
+        existente.Tipo = herramienta.Tipo;
+        existente.Valor=herramienta.Valor;
+        await _context.SaveChangesAsync();
+        return Ok(existente);
+        
+    }
+
+
 
 }
