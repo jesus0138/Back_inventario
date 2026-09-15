@@ -23,19 +23,46 @@ public class HerramientasController:ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetHerramientas()
     {
-        var herramientas=await _context.Herramientas.ToListAsync();
-        return Ok(herramientas);
+        var herramientas = await _context.Herramientas.ToListAsync();
+
+        var prestadoPorHerramienta = await _context.AsignacionHerramientas
+            .Where(a => a.FechaDevolucion == null)
+            .GroupBy(a => a.HerramientaId)
+            .Select(g => new { HerramientaId = g.Key, Prestado = g.Sum(a => a.Cantidad) })
+            .ToDictionaryAsync(x => x.HerramientaId, x => x.Prestado);
+
+        var resultado = herramientas.Select(h => new
+        {
+            h.Id,
+            h.Nombre,
+            h.Marca,
+            h.Modelo,
+            h.Tipo,
+            h.Color,
+            h.Stock,
+            Disponible = h.Stock - (prestadoPorHerramienta.ContainsKey(h.Id) ? prestadoPorHerramienta[h.Id] : 0),
+            h.FechaAdquisicion,
+            h.Valor
+        });
+
+        return Ok(resultado);
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostHerramientas(Herramienta herramienta)
+    public async Task<IActionResult> PostHerramientas(HerramientaCreateDto dto)
     {
-        bool existe = await _context.Herramientas
-            .AnyAsync(a => a.Id == herramienta.Id);
-        if (existe==true)
+        var herramienta = new Herramienta
         {
-            return BadRequest("asignacion existente");
-        }
+            Nombre = dto.Nombre,
+            Marca = dto.Marca,
+            Modelo = dto.Modelo,
+            Tipo = dto.Tipo,
+            Color = dto.Color,
+            Stock = dto.Stock,
+            Valor = dto.Valor,
+            FechaAdquisicion = DateTime.UtcNow
+        };
+
         _context.Herramientas.Add(herramienta);
         await _context.SaveChangesAsync();
         return Ok(herramienta);
