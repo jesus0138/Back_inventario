@@ -19,4 +19,6 @@ public class AsignacionHerramienta
     public DateTime FechaAsignacion { get; set; } = DateTime.UtcNow;
 
     public DateTime? FechaDevolucion { get; set; }
+    [MaxLength(15)]
+    public string? EstadoDevolucion { get; set; } // "Buena" o "Dañada", null mientras no se devuelva
 }
