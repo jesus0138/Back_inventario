@@ -63,8 +63,12 @@ public class AsignacionHerramientaController : ControllerBase
         int cantidadPrestadaActual = await _context.AsignacionHerramientas
             .Where(a => a.HerramientaId == dto.HerramientaId && a.FechaDevolucion == null)
             .SumAsync(a => a.Cantidad);
+        int cantidadDañada = await _context.AsignacionHerramientas
+            .Where(a => a.HerramientaId == dto.HerramientaId && a.EstadoDevolucion == "Dañada")
+            .SumAsync(a => a.Cantidad);
 
-        int disponible = herramienta.Stock - cantidadPrestadaActual;
+        int disponible = herramienta.Stock - cantidadPrestadaActual - cantidadDañada;
+        
 
         if (dto.Cantidad > disponible)
         {
@@ -88,7 +92,7 @@ public class AsignacionHerramientaController : ControllerBase
     }
 
     [HttpPut("{id}/devolver")]
-    public async Task<IActionResult> DevolverHerramienta(int id)
+    public async Task<IActionResult> DevolverHerramienta(int id, DevolucionDto dto)
     {
         var asignacion = await _context.AsignacionHerramientas.FindAsync(id);
         if (asignacion == null)
@@ -102,8 +106,20 @@ public class AsignacionHerramientaController : ControllerBase
         }
 
         asignacion.FechaDevolucion = DateTime.UtcNow;
+        asignacion.EstadoDevolucion = dto.EstadoDevolucion;
         await _context.SaveChangesAsync();
 
         return Ok(asignacion);
+    }
+    [HttpGet("danadas")]
+    public async Task<IActionResult> GetAsignacionesDanadas()
+    {
+        var danadas = await _context.AsignacionHerramientas
+            .Include(a => a.Herramienta)
+            .Include(a => a.Persona)
+            .Include(a => a.Cuadrilla)
+            .Where(a => a.EstadoDevolucion == "Dañada")
+            .ToListAsync();
+        return Ok(danadas);
     }
 }
