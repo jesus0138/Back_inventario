@@ -102,6 +102,42 @@ public class HerramientasController:ControllerBase
         return Ok(existente);
         
     }
+    [HttpGet("con-disponibilidad")]
+    public async Task<IActionResult> GetHerramientasConDisponibilidad()
+    {
+        var herramientas = await _context.Herramientas.ToListAsync();
+
+        var resultado = new List<object>();
+
+        foreach (var h in herramientas)
+        {
+            int prestadoActivo = await _context.AsignacionHerramientas
+                .Where(a => a.HerramientaId == h.Id && a.FechaDevolucion == null)
+                .SumAsync(a => a.Cantidad);
+
+            int danado = await _context.AsignacionHerramientas
+                .Where(a => a.HerramientaId == h.Id && a.EstadoDevolucion == "Dañada")
+                .SumAsync(a => a.Cantidad);
+
+            resultado.Add(new
+            {
+                h.Id,
+                h.Nombre,
+                h.Marca,
+                h.Modelo,
+                h.Tipo,
+                h.Color,
+                h.Stock,
+                h.FechaAdquisicion,
+                h.Valor,
+                Disponible = h.Stock - prestadoActivo - danado,
+                Danado = danado,
+                PrestadoActivo = prestadoActivo
+            });
+        }
+
+        return Ok(resultado);
+    }
 
 
 

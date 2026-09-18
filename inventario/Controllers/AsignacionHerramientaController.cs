@@ -122,4 +122,27 @@ public class AsignacionHerramientaController : ControllerBase
             .ToListAsync();
         return Ok(danadas);
     }
+    [HttpGet("persona/{personaId}")]
+    public async Task<IActionResult> GetAsignacionesPorPersona(int personaId)
+    {
+        var asignaciones = await _context.AsignacionHerramientas
+            .Include(a => a.Herramienta)
+            .Include(a => a.Persona)
+            .Include(a => a.Cuadrilla)
+            .Where(a => a.PersonaId == personaId && a.FechaDevolucion == null)
+            .ToListAsync();
+        return Ok(asignaciones);
+    }
+
+    [HttpGet("cuadrilla/{cuadrillaId}")]
+    public async Task<IActionResult> GetAsignacionesPorCuadrilla(int cuadrillaId)
+    {
+        var asignaciones = await _context.AsignacionHerramientas
+            .Include(a => a.Herramienta)
+            .Include(a => a.Persona)
+            .Include(a => a.Cuadrilla)
+            .Where(a => a.CuadrillaId == cuadrillaId && a.FechaDevolucion == null)
+            .ToListAsync();
+        return Ok(asignaciones);
+    }
 }
