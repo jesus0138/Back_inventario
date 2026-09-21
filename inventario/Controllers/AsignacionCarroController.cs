@@ -55,11 +55,28 @@ public class AsignacionCarroController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> PostAsignacionCarro(AsignacionCarroCreateDto dto)
     {
-        bool existe = await _context.AsignacionCarros
+        var carro = await _context.Carros.FindAsync(dto.CarroId);
+        if (carro == null)
+        {
+            return NotFound("Carro no encontrado");
+        }
+
+        bool yaAsignado = await _context.AsignacionCarros
             .AnyAsync(a => a.CarroId == dto.CarroId && a.FechaDevolucion == null);
-        if (existe)
+        if (yaAsignado)
         {
             return BadRequest("Este carro ya está asignado actualmente");
+        }
+
+        var ultimaAsignacion = await _context.AsignacionCarros
+            .Where(a => a.CarroId == dto.CarroId && a.FechaDevolucion != null)
+            .OrderByDescending(a => a.FechaDevolucion)
+            .FirstOrDefaultAsync();
+
+        if (ultimaAsignacion != null &&
+            (ultimaAsignacion.EstadoDevolucion == "Dañado" || ultimaAsignacion.EstadoDevolucion == "En reparación"))
+        {
+            return BadRequest($"Este carro no se puede asignar. Estado actual: {ultimaAsignacion.EstadoDevolucion}");
         }
 
         var asignacion = new AsignacionCarro
@@ -106,15 +123,45 @@ public class AsignacionCarroController : ControllerBase
     }
 
     [HttpPatch("{id}/devolver")]
-    public async Task<IActionResult> PatchAsignacionCarro(int id)
+    public async Task<IActionResult> DevolverCarro(int id, DevolucionCarro dto)
     {
         var existente = await _context.AsignacionCarros.FindAsync(id);
         if (existente == null)
         {
             return NotFound();
         }
+
+        if (existente.FechaDevolucion != null)
+        {
+            return BadRequest("Esta asignación ya fue devuelta anteriormente");
+        }
+
         existente.FechaDevolucion = DateTime.UtcNow;
+        existente.EstadoDevolucion = dto.EstadoDevolucion;
         await _context.SaveChangesAsync();
         return Ok(existente);
+    }
+
+    [HttpPatch("carro/{carroId}/reparar")]
+    public async Task<IActionResult> MarcarCarroReparado(int carroId)
+    {
+        var ultimaAsignacion = await _context.AsignacionCarros
+            .Where(a => a.CarroId == carroId && a.FechaDevolucion != null)
+            .OrderByDescending(a => a.FechaDevolucion)
+            .FirstOrDefaultAsync();
+
+        if (ultimaAsignacion == null)
+        {
+            return NotFound("No hay historial de devolución para este carro");
+        }
+
+        if (ultimaAsignacion.EstadoDevolucion != "Dañado" && ultimaAsignacion.EstadoDevolucion != "En reparación")
+        {
+            return BadRequest("Este carro no está marcado como dañado o en reparación");
+        }
+
+        ultimaAsignacion.EstadoDevolucion = "Bueno";
+        await _context.SaveChangesAsync();
+        return Ok(ultimaAsignacion);
     }
 }
