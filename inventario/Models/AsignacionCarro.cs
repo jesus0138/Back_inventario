@@ -20,4 +20,5 @@ public class AsignacionCarro
     public  DateTime? FechaDevolucion { get; set; }
     [ForeignKey("AsignadoPorUsuarioId")]
     public virtual Usuario AsignadoPorUsuario { get; set; } = null!;
+    public string? EstadoDevolucion { get; set; } // "Bueno", "Necesita mantenimiento", "Dañado", "En reparación"
 }

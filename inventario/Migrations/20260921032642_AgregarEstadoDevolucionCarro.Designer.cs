@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using inventario.Data;
@@ -11,9 +12,11 @@ using inventario.Data;
 namespace inventario.Migrations
 {
     [DbContext(typeof(AppDbInventario))]
-    partial class AppDbInventarioModelSnapshot : ModelSnapshot
+    [Migration("20260921032642_AgregarEstadoDevolucionCarro")]
+    partial class AgregarEstadoDevolucionCarro
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
