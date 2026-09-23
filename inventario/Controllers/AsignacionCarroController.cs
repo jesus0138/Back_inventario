@@ -164,4 +164,15 @@ public class AsignacionCarroController : ControllerBase
         await _context.SaveChangesAsync();
         return Ok(ultimaAsignacion);
     }
+    [HttpGet("cuadrilla/{cuadrillaId}")]
+    public async Task<IActionResult> GetAsignacionesCarroPorCuadrilla(int cuadrillaId)
+    {
+        var asignaciones = await _context.AsignacionCarros
+            .Include(a => a.Carro)
+            .Include(a => a.Persona)
+            .Include(a => a.AsignadoPorUsuario)
+            .Where(a => a.Persona.CuadrillaId == cuadrillaId && a.FechaDevolucion == null)
+            .ToListAsync();
+        return Ok(asignaciones);
+    }
 }
