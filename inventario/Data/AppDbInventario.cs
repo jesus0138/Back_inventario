@@ -18,6 +18,8 @@ public class AppDbInventario : DbContext
     public DbSet<Proceso> Procesos { get; set; }
     public DbSet<AsignacionHerramienta> AsignacionHerramientas { get; set; }
     public DbSet<Herramienta> Herramientas { get; set; }
+    public DbSet<CompraItem> CompraItems { get; set; }
+    public DbSet<OrdenCompra>  OrdenCompras { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -59,4 +61,5 @@ public class AppDbInventario : DbContext
             .HasForeignKey(a => a.AsignadoPorUsuarioId)
             .OnDelete(DeleteBehavior.Restrict);
     }
+    
 }
